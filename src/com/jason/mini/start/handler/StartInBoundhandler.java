@@ -13,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jason.mini.sayhello.action.SayHelloAction;
 import com.jason.mini.start.module.ModuleManager;
 import com.jason.mini.start.servlet.ActionInvocation;
 
@@ -80,10 +79,12 @@ public class StartInBoundhandler extends SimpleChannelInboundHandler<Object>{
     private void handleWebSocketRequest(ChannelHandlerContext ctx, WebSocketFrame frame) {
 		if(frame instanceof CloseWebSocketFrame) {
 			handshaker.close(ctx.channel(), (CloseWebSocketFrame)frame.retain());
+			return;
 		}
 		
 		if(frame instanceof PingWebSocketFrame) {
 			ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
+			return;
 		}
 		
 		if(!(frame instanceof TextWebSocketFrame)) {
@@ -123,12 +124,9 @@ public class StartInBoundhandler extends SimpleChannelInboundHandler<Object>{
 			} catch (InvocationTargetException e) {
 				e.printStackTrace();
 			}
+		}else{
+			ctx.writeAndFlush(new TextWebSocketFrame("不存在的cmd"));
 		}
-//		if(cmd.equalsIgnoreCase("sayHello")) {
-//			SayHelloAction action = new SayHelloAction();
-//			TextWebSocketFrame frame1 = action.sayHello();
-//			ctx.writeAndFlush(frame1);
-//		}
 	}
 	
     @Override
@@ -138,7 +136,7 @@ public class StartInBoundhandler extends SimpleChannelInboundHandler<Object>{
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
+    	System.out.println("远程连接关闭");
     }
 
     @Override
