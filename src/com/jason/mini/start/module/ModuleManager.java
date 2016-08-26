@@ -91,9 +91,18 @@ public class ModuleManager {
 					if(cmdMap.containsKey(cmdValue)) {
 						continue;
 					}
-					// 此时表示是一个用来处理前端请求的方法 
-					ActionInvocation ai = new ActionInvocation(clazz, method);
-					cmdMap.put(cmdValue, ai);
+					
+					Object object = null;
+					try {
+						object = clazz.newInstance();
+					} catch (InstantiationException e) {
+					} catch (IllegalAccessException e) {
+					}
+					if(object != null) {
+						// 此时表示是一个用来处理前端请求的方法 
+						ActionInvocation ai = new ActionInvocation(object, method);
+						cmdMap.put(cmdValue, ai);
+					}
 				}
 			}
 			 

@@ -112,11 +112,9 @@ public class StartInBoundhandler extends SimpleChannelInboundHandler<Object>{
 		
 		if(ai != null) {
 			try {
-				Object action = ai.getClazz().newInstance();
+				Object action = ai.getObject();
 				TextWebSocketFrame frame1 = (TextWebSocketFrame)(ai.getMethod().invoke(action));
 				ctx.writeAndFlush(frame1);
-			} catch (InstantiationException e) {
-				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {

@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 public class ActionInvocation {
 
-	Class<?> clazz;
+	Object object;
 	
 	Method method;
 	
@@ -13,21 +13,22 @@ public class ActionInvocation {
 	String methodName;
 
 
-	public ActionInvocation(Class<?> clazz, Method method) {
-		this.clazz = clazz;
+	public Object getObject() {
+		return object;
+	}
+
+
+	public void setObject(Object object) {
+		this.object = object;
+	}
+
+	public ActionInvocation(Object object, Method method) {
+		this.object = object;
 		this.method = method;
-		this.actionName = clazz.getSimpleName();
+		this.actionName = object.getClass().getSimpleName();
 		this.methodName = method.getName();
 	}
 	
-	public Class<?> getClazz() {
-		return clazz;
-	}
-
-	public void setClazz(Class<?> clazz) {
-		this.clazz = clazz;
-	}
-
 	public Method getMethod() {
 		return method;
 	}
