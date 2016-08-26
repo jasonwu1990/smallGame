@@ -6,12 +6,16 @@ import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jason.mini.sayhello.action.SayHelloAction;
+import com.jason.mini.start.module.ModuleManager;
+import com.jason.mini.start.servlet.ActionInvocation;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -101,12 +105,30 @@ public class StartInBoundhandler extends SimpleChannelInboundHandler<Object>{
 			logger.error(e.getMessage());
 		}
 		
-		String cmd = jsonObject.getString("cmd");
-		if(cmd.equalsIgnoreCase("sayHello")) {
-			SayHelloAction action = new SayHelloAction();
-			TextWebSocketFrame frame1 = action.sayHello();
-			ctx.writeAndFlush(frame1);
+		String cmdValue = jsonObject.getString("cmd");
+		
+		ActionInvocation ai = ModuleManager.getInstance().getActionInvocation(cmdValue);
+		
+		if(ai != null) {
+			try {
+				Object action = ai.getClazz().newInstance();
+				TextWebSocketFrame frame1 = (TextWebSocketFrame)(ai.getMethod().invoke(action));
+				ctx.writeAndFlush(frame1);
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
 		}
+//		if(cmd.equalsIgnoreCase("sayHello")) {
+//			SayHelloAction action = new SayHelloAction();
+//			TextWebSocketFrame frame1 = action.sayHello();
+//			ctx.writeAndFlush(frame1);
+//		}
 	}
 	
     @Override

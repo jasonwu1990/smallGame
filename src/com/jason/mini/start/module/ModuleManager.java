@@ -2,7 +2,12 @@ package com.jason.mini.start.module;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -10,9 +15,12 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import com.jason.mini.annocation.Action;
+import com.jason.mini.annocation.Command;
+import com.jason.mini.start.servlet.ActionInvocation;
 
 public class ModuleManager {
 
@@ -22,15 +30,43 @@ public class ModuleManager {
 		return instance;
 	}
 	
-	Map<String, Class<?>> action2Class = new HashMap<String, Class<?>> ();
+	Map<String, ActionInvocation> cmdMap = new HashMap<String, ActionInvocation> ();
 	
 	public void initModule() {
 		// 读取配置文件获取action加载路径
-		String pack = "";
+		String path = System.getProperty("user.dir")+File.separator+"properties"+File.separator;
+		String fileName = "config.properties";
+		File file = new File(path+fileName);
+		if(!file.exists()) {
+			return;
+		}
+		Properties prop = new Properties();
+		InputStream fis = null;
+		String pack = null;
+		try {
+			fis = new FileInputStream(file);
+			prop.load(fis);
+			if(prop.getProperty("actionPackage") != null) {
+				pack = (String)prop.getProperty("actionPackage");
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if(pack == null) {
+			return;
+		}
+		
 		Set<Class<?>> classes = ModuleManager.getClasses(pack);
 		for(Class<?> clazz : classes) {
 			initHandleAction(clazz);
 		}
+	}
+	
+	public ActionInvocation getActionInvocation(String cmdValue) {
+		return cmdMap.get(cmdValue);
 	}
 	
 	private void initHandleAction(Class<?> clazz) {
@@ -38,6 +74,30 @@ public class ModuleManager {
 			return ;
 		}
 		Action action = ModuleManager.getAnnocation(clazz, Action.class);
+		if(action != null) {
+			Method[] methods = clazz.getDeclaredMethods();
+			if(methods != null && methods.length > 0) {
+				for(Method method : methods) {
+					if(Modifier.isStatic(method.getModifiers()) && !Modifier.isFinal(method.getModifiers())) {
+						continue;
+					}
+					Command cmd = method.getAnnotation(Command.class);
+					if(cmd == null) {
+						continue;
+					}
+					// 获取cmd的value（注解中的）
+					String cmdValue = cmd.value();
+					// 这个接口已注册
+					if(cmdMap.containsKey(cmdValue)) {
+						continue;
+					}
+					// 此时表示是一个用来处理前端请求的方法 
+					ActionInvocation ai = new ActionInvocation(clazz, method);
+					cmdMap.put(cmdValue, ai);
+				}
+			}
+			 
+		}
 	}
 	
 	public static <T extends Annotation> T getAnnocation(Class<?> clazz, Class<T> anClass) {
@@ -45,7 +105,7 @@ public class ModuleManager {
 		T annotation = null;
 		while(null != cc && cc != Object.class) {
 			annotation = cc.getAnnotation(anClass);
-			if(null != null) {
+			if(annotation != null) {
 				return annotation;
 			}
 			cc = cc.getSuperclass();
