@@ -15,8 +15,8 @@ import java.util.Set;
 
 import com.jason.mini.annocation.Action;
 import com.jason.mini.annocation.Command;
-import com.jason.mini.start.Const.GameConstants;
 import com.jason.mini.start.config.ConfigManager;
+import com.jason.mini.start.consts.GameConstants;
 import com.jason.mini.start.servlet.ActionInvocation;
 
 public class ModuleManager {
@@ -32,7 +32,7 @@ public class ModuleManager {
 	public void initModule() {
 		// 读取配置文件获取action加载路径
 		String path = GameConstants.path;
-		String fileName = "config.properties";
+		String fileName = GameConstants.configFileName;
 		File file = new File(path+fileName);
 		if(!file.exists()) {
 			return;

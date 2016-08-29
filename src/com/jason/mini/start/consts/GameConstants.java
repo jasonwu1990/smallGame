@@ -8,7 +8,6 @@ public class GameConstants {
 	
 	public static final String configFileName = "config.properties";
 	
-	
 	public static final String KEY_TCPPORT = "tcpport";
 	
 	public static final String KEY_ACTIONPACKAGE = "actionPackage";

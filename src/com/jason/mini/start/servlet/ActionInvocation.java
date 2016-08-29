@@ -12,7 +12,13 @@ public class ActionInvocation {
 	
 	String methodName;
 
-
+	public ActionInvocation(Object object, Method method) {
+		this.object = object;
+		this.method = method;
+		this.actionName = object.getClass().getSimpleName();
+		this.methodName = method.getName();
+	}
+	
 	public Object getObject() {
 		return object;
 	}
@@ -20,13 +26,6 @@ public class ActionInvocation {
 
 	public void setObject(Object object) {
 		this.object = object;
-	}
-
-	public ActionInvocation(Object object, Method method) {
-		this.object = object;
-		this.method = method;
-		this.actionName = object.getClass().getSimpleName();
-		this.methodName = method.getName();
 	}
 	
 	public Method getMethod() {

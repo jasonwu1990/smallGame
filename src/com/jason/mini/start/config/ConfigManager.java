@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import com.jason.mini.start.Const.GameConstants;
+import com.jason.mini.start.consts.GameConstants;
 
 public class ConfigManager {
 

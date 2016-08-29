@@ -1,7 +1,7 @@
 package com.jason.mini.start;
 
-import com.jason.mini.start.Const.GameConstants;
 import com.jason.mini.start.config.ConfigManager;
+import com.jason.mini.start.consts.GameConstants;
 import com.jason.mini.start.handler.StartInBoundhandler;
 import com.jason.mini.start.module.ModuleManager;
 
