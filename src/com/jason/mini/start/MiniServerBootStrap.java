@@ -1,5 +1,7 @@
 package com.jason.mini.start;
 
+import com.jason.mini.start.Const.GameConstants;
+import com.jason.mini.start.config.ConfigManager;
 import com.jason.mini.start.handler.StartInBoundhandler;
 import com.jason.mini.start.module.ModuleManager;
 
@@ -19,10 +21,16 @@ public class MiniServerBootStrap {
 	
 	public void startUp() throws InterruptedException {
 		
+		// 初始化配置文件
+		ConfigManager.getInstance().initConfig();
+		
 		initModule();
 		
-		// TODO:加载配置文件获得tcp端口
-		int port = 9000;
+		String portStr = ConfigManager.getInstance().getPropertyString(GameConstants.KEY_TCPPORT);
+		if(portStr == null) {
+			throw new InterruptedException();
+		}
+		int port = Integer.valueOf(portStr);
 		
 		EventLoopGroup boseGroup = new NioEventLoopGroup();
 		EventLoopGroup chileGroup = new NioEventLoopGroup();

@@ -2,10 +2,6 @@ package com.jason.mini.start.module;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -15,11 +11,12 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import com.jason.mini.annocation.Action;
 import com.jason.mini.annocation.Command;
+import com.jason.mini.start.Const.GameConstants;
+import com.jason.mini.start.config.ConfigManager;
 import com.jason.mini.start.servlet.ActionInvocation;
 
 public class ModuleManager {
@@ -34,26 +31,13 @@ public class ModuleManager {
 	
 	public void initModule() {
 		// 读取配置文件获取action加载路径
-		String path = System.getProperty("user.dir")+File.separator+"properties"+File.separator;
+		String path = GameConstants.path;
 		String fileName = "config.properties";
 		File file = new File(path+fileName);
 		if(!file.exists()) {
 			return;
 		}
-		Properties prop = new Properties();
-		InputStream fis = null;
-		String pack = null;
-		try {
-			fis = new FileInputStream(file);
-			prop.load(fis);
-			if(prop.getProperty("actionPackage") != null) {
-				pack = (String)prop.getProperty("actionPackage");
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		String pack = ConfigManager.getInstance().getPropertyString(GameConstants.KEY_ACTIONPACKAGE);
 		
 		if(pack == null) {
 			return;
