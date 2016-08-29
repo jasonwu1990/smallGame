@@ -1,4 +1,4 @@
-package com.jason.mini.start.Const;
+package com.jason.mini.start.consts;
 
 import java.io.File;
 
